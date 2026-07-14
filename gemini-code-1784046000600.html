@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة المتنبي التعليمية المتكاملة | Massar Ultimate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #060608; --bg-card: #111116; --bg-input: #1a1a24;
+            --accent: #00ffcc; --accent-hover: #00d4aa;
+            --text-main: #ffffff; --text-muted: #8b8b9f; --danger: #ff4d4d;
+            --sidebar-width: 280px; --shadow-glow: 0 0 15px rgba(0, 255, 204, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-main); overflow-x: hidden; scroll-behavior: smooth; }
+        .app-page { display: none; opacity: 0; transition: opacity 0.4s ease; }
+        .app-page.active-page { display: block; opacity: 1; }
+
+        .btn-primary { background: linear-gradient(135deg, var(--accent), #00b38f); color: #000; padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; font-size: 15px; transition: all 0.3s ease; box-shadow: var(--shadow-glow); width: 100%; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 25px rgba(0, 255, 204, 0.3); }
+        .form-group { margin-bottom: 20px; text-align: right; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 700; color: #ccc; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 14px; background-color: var(--bg-input); border: 1px solid #2c2c3e; color: white; border-radius: 8px; font-size: 15px; transition: border 0.3s; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); outline: none; }
+
+        header.public-header { background-color: rgba(17, 17, 22, 0.9); backdrop-filter: blur(10px); padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,255,204,0.2); position: sticky; top: 0; z-index: 100; }
+        header.public-header h1 { color: var(--accent); font-size: 26px; font-weight: 800; text-shadow: var(--shadow-glow); }
+        .hero { background: linear-gradient(rgba(6, 6, 8, 0.9), rgba(6, 6, 8, 0.95)), url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1350&q=80') center/cover; height: 380px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+        .hero h2 { font-size: 42px; color: var(--accent); margin-bottom: 15px; font-weight: 800; }
+        
+        .container { max-width: 1200px; margin: 50px auto; padding: 0 20px; }
+        .section-title { margin-bottom: 35px; border-bottom: 2px solid var(--accent); padding-bottom: 10px; display: inline-block; font-size: 24px; font-weight: 700; }
+        .lessons-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        .lesson-card { background-color: var(--bg-card); border-radius: 16px; overflow: hidden; border: 1px solid #1a1a24; transition: transform 0.3s, box-shadow 0.3s; }
+        .lesson-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .lesson-image { height: 150px; display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 22px; color: white; }
+        .lesson-content { padding: 25px; }
+
+        .dashboard-layout { display: flex; min-height: 100vh; }
+        .sidebar { position: fixed; right: 0; top: 0; width: var(--sidebar-width); height: 100vh; background-color: var(--bg-card); border-left: 1px solid #1a1a24; padding: 40px 25px; display: flex; flex-direction: column; }
+        .profile-box { text-align: center; padding-bottom: 30px; border-bottom: 1px solid #1a1a24; margin-bottom: 30px; }
+        .profile-avatar { width: 80px; height: 80px; background: #1a1a24; border: 2px solid var(--accent); border-radius: 50%; margin: 0 auto 15px; display: flex; justify-content: center; align-items: center; font-size: 32px; box-shadow: var(--shadow-glow); }
+        .nav-menu { list-style: none; flex-grow: 1; }
+        .nav-item button { width: 100%; background: none; border: none; text-align: right; padding: 14px 20px; color: var(--text-muted); cursor: pointer; border-radius: 10px; font-size: 16px; font-weight: 700; transition: all 0.2s; margin-bottom: 8px; }
+        .nav-item.active button, .nav-item button:hover { background-color: rgba(0, 255, 204, 0.1); color: var(--accent); }
+        .main-content { margin-right: var(--sidebar-width); padding: 50px; width: calc(100% - var(--sidebar-width)); background: #060608; min-height: 100vh; }
+        .view-section { display: none; background-color: var(--bg-card); border: 1px solid #1a1a24; padding: 40px; border-radius: 20px; margin-bottom: 40px; }
+        .view-section.show { display: block; animation: fadeIn 0.5s ease; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 16px; text-align: center; border-bottom: 1px solid #1a1a24; }
+        th { background-color: #151522; color: var(--accent); }
+        .badge-grade { background-color: rgba(0, 255, 204, 0.1); border: 1px solid rgba(0,255,204,0.3); color: var(--accent); padding: 6px 12px; border-radius: 8px; font-weight: bold; }
+        .badge-danger { background-color: rgba(255, 77, 77, 0.1); border: 1px solid rgba(255,77,77,0.3); color: var(--danger); padding: 6px 12px; border-radius: 8px; font-weight: bold; }
+        .badge-success { background-color: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.3); color: #2ecc71; padding: 6px 12px; border-radius: 8px; font-weight: bold; }
+        .grade-input { width: 70px; padding: 10px; background-color: var(--bg-main); border: 1px solid #333; color: var(--accent); text-align: center; border-radius: 8px; font-weight: bold; }
+
+        .download-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 9999; }
+        .download-box { background: var(--bg-card); padding: 40px; border-radius: 20px; text-align: center; width: 90%; max-width: 500px; border: 1px solid var(--accent); box-shadow: var(--shadow-glow); }
+        .progress-bar-container { background: #1a1a24; height: 15px; width: 100%; border-radius: 10px; margin: 25px 0; overflow: hidden; }
+        .progress-bar-fill { background: linear-gradient(90deg, var(--accent), #00b38f); height: 100%; width: 0%; transition: width 0.1s linear; }
+
+        .timer-display { font-size: 64px; font-weight: 800; color: var(--accent); margin: 20px 0; text-shadow: var(--shadow-glow); font-family: monospace; }
+        .fun-card { background: #1a1a24; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-right: 4px solid var(--accent); }
+        .year-selector { display:inline-block; width:auto; padding:8px 15px; border-radius:8px; background:#151522; color:var(--accent); border:1px solid rgba(0,255,204,0.3); font-weight:bold; cursor:pointer; outline:none; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+
+        /* منطقة كروت الطباعة - مخفية فالشاشة العادية */
+        #print-area { display: none; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ستايل مخصص ومحترف للطباعة الملموسة والقص */
+        @media print {
+            body { background: white !important; color: black !important; }
+            #page-dashboard, #page-public, #page-login, .download-modal, header, .sidebar, .main-content { display: none !important; }
+            #print-area { display: grid !important; grid-template-columns: repeat(2, 1fr); gap: 20px; padding: 10px; width: 100%; direction: rtl; }
+            .print-card { border: 2px dashed #000 !important; padding: 20px; border-radius: 10px; background: #fff !important; color: #000 !important; box-shadow: none !important; page-break-inside: avoid; text-align: right; }
+            .print-card-header { font-weight: 800; font-size: 16px; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px; text-align: center; color: #000 !important; }
+            .print-card-body div { margin-bottom: 8px; font-size: 14px; color: #000 !important; }
+            .print-card-body b { color: #000 !important; }
+            .print-card-footer { font-size: 11px; text-align: center; color: #555 !important; margin-top: 12px; border-top: 1px dashed #666; padding-top: 6px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="download-overlay" class="download-modal">
+        <div class="download-box">
+            <h3 style="font-size: 22px;" id="download-title-text">جاري تحضير ملف الامتحان...</h3>
+            <p style="color: var(--text-muted); margin-top: 10px;">المرجو عدم إغلاق الصفحة.</p>
+            <div class="progress-bar-container"><div id="p-bar" class="progress-bar-fill"></div></div>
+            <div style="font-size: 24px; font-weight: bold; color: var(--accent);" id="p-text">0%</div>
+        </div>
+    </div>
+
+    <div id="page-public" class="app-page active-page">
+        <header class="public-header">
+            <h1>المتنبي للتعليم 🎓</h1>
+            <button class="btn-primary" style="width: auto; padding: 10px 30px;" onclick="navigateTo('page-login')">الدخول لمنظومة مسار</button>
+        </header>
+        <section class="hero">
+            <h2>مرحباً بكم في منصة المتنبي للتعليم المتقدمة</h2>
+            <p>منظومة رقمية متكاملة بلمسة احترافية للدروس، أرشيف الامتحانات، ومتابعة النقط.</p>
+        </section>
+        
+        <main class="container">
+            <h2 class="section-title" style="border-bottom-color: #9b59b6;">📚 الفروض والدروس المضافة حديثاً</h2>
+            <div id="public-dynamic-lessons" class="lessons-grid" style="margin-bottom: 50px;">
+                </div>
+
+            <h2 class="section-title">آخر المستجدات التعليمية</h2>
+            <div class="lessons-grid">
+                <div class="lesson-card">
+                    <div class="lesson-image" style="background: linear-gradient(135deg, #2ecc71, #1abc9c);">نصائح توجيهية</div>
+                    <div class="lesson-content">
+                        <h3>كيفية تنظيم الوقت للمراجعة</h3>
+                        <p>أفضل الطرق والنصائح العملية لتنظيم وقتك والاستعداد النفسي للامتحانات.</p>
+                        <button class="btn-primary" style="background: transparent; border: 1px solid #2ecc71; color: #2ecc71; box-shadow: none;">اقرأ المزيد ←</button>
+                    </div>
+                </div>
+
+                <div class="lesson-card" style="border-color: #e67e22;">
+                    <div class="lesson-image" style="background: linear-gradient(135deg, #e67e22, #d35400);">أرشيف الامتحانات الوطنية</div>
+                    <div class="lesson-content">
+                        <h3>حمل الامتحانات (2000 - 2025)</h3>
+                        <select id="public-exam-subject" class="form-group" style="margin-bottom: 10px;">
+                            <option value="Math">الرياضيات (Math)</option>
+                            <option value="PC">الفيزياء والكيمياء (PC)</option>
+                            <option value="SVT">علوم الحياة والأرض (SVT)</option>
+                        </select>
+                        <select id="public-exam-year" class="form-group" style="margin-bottom: 15px;"></select>
+                        <button class="btn-primary" style="background: #e67e22; box-shadow: 0 0 15px rgba(230, 126, 34, 0.3);" onclick="startAnimatedDownload()">تحميل الامتحان 📥</button>
+                    </div>
+                </div>
+
+                <div class="lesson-card">
+                    <div class="lesson-image" style="background: linear-gradient(135deg, #3498db, #2980b9);">درس الرياضيات</div>
+                    <div class="lesson-content">
+                        <h3>ملخص درس الدوال والاتصال</h3>
+                        <p>شرح مبسط بالفيديو والتمارين التطبيقية لدرس الاتصال لجميع الشعب.</p>
+                        <button class="btn-primary" style="background: transparent; border: 1px solid #3498db; color: #3498db; box-shadow: none;">تابع الدرس ←</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="page-login" class="app-page">
+        <div class="login-wrapper" style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+            <div class="login-card" style="background: var(--bg-card); padding: 50px; border-radius: 20px; width:400px; text-align:center; box-shadow: 0 0 30px rgba(0,0,0,0.5);">
+                <h1 style="color:var(--accent); margin-bottom:10px;">MASSAR PRO</h1>
+                <p style="color:var(--text-muted); margin-bottom:30px;">فضاء الخدمات الإلكترونية</p>
+                <div class="form-group"><label>البريد الإلكتروني</label><input type="text" id="input-email" placeholder="Email..."></div>
+                <div class="form-group"><label>كلمة المرور</label><input type="password" id="input-pass" placeholder="••••••••"></div>
+                <button class="btn-primary" onclick="processLogin()">تسجيل الدخول</button>
+                <button style="margin-top:20px; background:none; border:none; color:var(--text-muted); cursor:pointer;" onclick="navigateTo('page-public')">← العودة للرئيسية</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-dashboard" class="app-page">
+        <div class="dashboard-layout">
+            
+            <aside class="sidebar">
+                <div class="profile-box">
+                    <div class="profile-avatar" id="avatar-icon">👤</div>
+                    <div class="profile-name" id="user-display-email">---</div>
+                    <div style="font-size: 13px; color: var(--accent); margin-top:8px;" id="user-display-role">---</div>
+                </div>
+                <ul class="nav-menu" id="dynamic-menu"></ul>
+                <button class="btn-logout" style="background-color: #1a1a24; color: var(--danger); border: 1px solid rgba(255,77,77,0.2); padding: 14px; width: 100%; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: auto;" onclick="processLogout()">تسجيل الخروج 🔴</button>
+            </aside>
+
+            <main class="main-content">
+                <div class="top-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+                    <h2 id="dashboard-title">بوابة الخدمات الإلكترونية</h2>
+                </div>
+
+                <div id="sec-student-grades" class="view-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom:20px;">
+                        <h3 style="color: var(--accent);">📊 بيان نقط الفروض والامتحانات</h3>
+                        <select id="student-year-select" class="year-selector" onchange="renderStudentGrades(); renderStudentAttendance();">
+                            <option value="2026">موسم 2026/2027</option>
+                            <option value="2027">موسم 2027/2028</option>
+                            <option value="2028">موسم 2028/2029</option>
+                            <option value="2029">موسم 2029/2030</option>
+                            <option value="2030">موسم 2030/2031</option>
+                        </select>
+                    </div>
+
+                    <div id="result-banner" style="background: linear-gradient(135deg, rgba(0,255,204,0.05) 0%, rgba(17,17,22,1) 100%); border: 1px solid rgba(0,255,204,0.2); padding: 25px; border-radius: 16px; margin-bottom: 30px; display:flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h3 style="margin-bottom:5px;">📝 النتيجة الإجمالية</h3>
+                            <p style="color: var(--text-muted); font-size:13px;">خاصة بالموسم المختار أعلاه.</p>
+                        </div>
+                        <div style="text-align: left;">
+                            <h2 id="final-average-val" style="color: var(--accent); font-size: 36px;">--.--</h2>
+                            <span id="final-status-badge" style="font-weight:bold; font-size: 14px;">---</span>
+                        </div>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr><th>المادة</th><th>فرض 1</th><th>فرض 2</th><th>فرض 3</th><th>فرض 4</th><th>الامتحان</th><th>معدل المادة</th></tr>
+                        </thead>
+                        <tbody id="student-grades-tbody"></tbody>
+                    </table>
+                </div>
+
+                <div id="sec-student-attendance" class="view-section">
+                    <h3 style="color: var(--accent); margin-bottom: 20px;">📅 كشف الغيابات الخاص بي</h3>
+                    <table>
+                        <thead>
+                            <tr><th>التاريخ</th><th>المادة / الحصة</th><th>حالة الغياب</th><th>المبرر</th></tr>
+                        </thead>
+                        <tbody id="student-attendance-tbody"></tbody>
+                    </table>
+                </div>
+
+                <div id="sec-student-fun" class="view-section">
+                    <h3 style="color: var(--accent); margin-bottom:20px;">🎯 فضاء التحدي والتركيز (Moutanabi Club)</h3>
+                    <div class="grid-2">
+                        <div style="background: var(--bg-card); padding: 30px; border-radius: 16px; border: 1px solid #2c2c3e; text-align: center;">
+                            <h4 style="color: white;">⏱️ مؤقت التركيز (Pomodoro)</h4>
+                            <div class="timer-display" id="pomodoro-time">25:00</div>
+                            <div style="display:flex; gap:10px; justify-content:center;">
+                                <button class="btn-primary" style="width:100px; background:#2ecc71; color:black;" onclick="startTimer()">ابدأ</button>
+                                <button class="btn-primary" style="width:100px; background:var(--danger); color:white;" onclick="pauseTimer()">إيقاف</button>
+                                <button class="btn-primary" style="width:100px; background:#f1c40f; color:black;" onclick="resetTimer()">إعادة</button>
+                            </div>
+                        </div>
+                        <div style="background: var(--bg-card); padding: 30px; border-radius: 16px; border: 1px solid #2c2c3e;">
+                            <h4 style="color: white; margin-bottom: 15px;">🧠 لغز اليوم لتنشيط العقل</h4>
+                            <div class="fun-card">
+                                <p id="riddle-question" style="font-weight: bold; color: #fff;"></p>
+                                <button class="btn-primary" style="width: auto; padding: 6px 15px; font-size: 13px; margin-top: 10px; background: transparent; border:1px solid var(--accent); color:var(--accent);" onclick="revealRiddleAnswer()">👁️ كشف الجواب</button>
+                                <p id="riddle-answer" style="margin-top: 10px; color: #2ecc71; font-weight: bold; display: none;"></p>
+                            </div>
+                            <button class="btn-primary" style="font-size:13px; padding:8px;" onclick="loadNewRiddle()">اللغز التالي 🔄</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sec-student-complaint" class="view-section">
+                    <h3 style="color: var(--accent); margin-bottom:25px;">✍️ تقديم شكاية أو استفسار للأستاذ</h3>
+                    <div class="form-group"><label>اختر المادة المعنية:</label><select id="comp-subject"></select></div>
+                    <div class="form-group"><label>نص الشكاية بالتفصيل:</label><textarea id="comp-message" rows="5" placeholder="اكتب رسالتك هنا..."></textarea></div>
+                    <button class="btn-primary" style="width: 200px;" onclick="submitComplaint()">إرسال الشكاية 📤</button>
+                </div>
+
+                <div id="sec-teacher-publish" class="view-section">
+                    <h3 style="color: var(--accent); margin-bottom: 25px;">📥 نشر درس أو فرض جديد للتلاميذ</h3>
+                    <div style="background: #151522; padding: 30px; border-radius: 16px; border: 1px dashed rgba(0, 255, 204, 0.3);">
+                        <div class="form-group">
+                            <label>عنوان الدرس أو الواجب</label>
+                            <input type="text" id="pub-title" placeholder="مثال: الفرض المحروس رقم 1 دورة 1">
+                        </div>
+                        <div class="form-group">
+                            <label>رابط الفيديو الشارح أو الملف (Google Drive / YouTube)</label>
+                            <input type="text" id="pub-link" placeholder="أدخل الرابط الإلكتروني">
+                        </div>
+                        <div class="form-group">
+                            <label>المادة الدراسية المستهدفة</label>
+                            <select id="pub-subject"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>المستوى الدراسي المستهدف (الفئة)</label>
+                            <select id="pub-level">
+                                <option value="السنة الأولى إعدادي">السنة الأولى إعدادي</option>
+                                <option value="السنة الثانية إعدادي">السنة الثانية إعدادي</option>
+                                <option value="السنة الثالثة إعدادي">السنة الثالثة إعدادي</option>
+                                <option value="الجذع المشترك">الجذع المشترك</option>
+                                <option value="السنة الأولى بكالوريا">السنة الأولى بكالوريا</option>
+                                <option value="السنة الثانية بكالوريا">السنة الثانية بكالوريا</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>وصف بسيط وتوجيهات للتلاميذ</label>
+                            <textarea id="pub-desc" rows="4" placeholder="مثال: يرجى إنجاز التمرين 3 ص 24 وإرساله قبل الجمعة المقبلة..."></textarea>
+                        </div>
+                        <button class="btn-primary" style="background: #00ffcc; color: #000; font-size: 16px;" onclick="publishLesson()">نشر وتعميم الدرس للعموم</button>
+                    </div>
+                </div>
+
+                <div id="sec-teacher-grades" class="view-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                        <h3 style="color: var(--accent);">👨‍🏫 مسك النقط وإدارة أولياء الأمور</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-primary" style="background: #3498db; width: auto; font-size: 14px; box-shadow: none;" onclick="printStudentCards()">🖨️ طباعة بطاقات الدخول للطلاب</button>
+                            <button class="btn-primary" style="background: #25D366; width: auto; font-size: 14px; box-shadow: none;" onclick="exportStudentsCSV()">📥 تصدير اللائحة لـ Outlook (CSV)</button>
+                        </div>
+                    </div>
+
+                    <div style="background: #151522; padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 1px dashed rgba(0, 255, 204, 0.3);">
+                        <h4 style="color: var(--accent); margin-bottom: 15px; font-size: 16px;">👤 ربط كود مسار بالاسم الكامل للتلميذ</h4>
+                        <div style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+                            <div class="form-group" style="flex:1; min-width:150px; margin-bottom:0;">
+                                <label>المستوى الدراسي:</label>
+                                <select id="teacher-level-filter-map" onchange="updateStudentDropdowns()">
+                                    <option value="all">-- الكل --</option>
+                                    <option value="السنة الأولى إعدادي">السنة الأولى إعدادي</option>
+                                    <option value="السنة الثانية إعدادي">السنة الثانية إعدادي</option>
+                                    <option value="السنة الثالثة إعدادي">السنة الثالثة إعدادي</option>
+                                    <option value="الجذع المشترك">الجذع المشترك</option>
+                                    <option value="السنة الأولى بكالوريا">السنة الأولى بكالوريا</option>
+                                    <option value="السنة الثانية بكالوريا">السنة الثانية بكالوريا</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="flex:1.5; min-width:180px; margin-bottom:0;">
+                                <label>اختر الكود المراد تسميته:</label>
+                                <select id="map-student-code" onchange="loadMappedName()"></select>
+                            </div>
+                            <div class="form-group" style="flex:2; min-width:200px; margin-bottom:0;">
+                                <label>الاسم الكامل للتلميذ(ة):</label>
+                                <input type="text" id="map-student-name" placeholder="مثال: محمد العلمي">
+                            </div>
+                            <button class="btn-primary" style="width: auto; padding: 14px 25px;" onclick="saveStudentNameMapping()">حفظ الاسم 💾</button>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 15px; background: #151522; padding: 20px; border-radius: 12px; align-items: flex-end; flex-wrap: wrap;">
+                        <div class="form-group" style="flex:1; min-width:120px; margin-bottom:0;">
+                            <label>الموسم الدراسي:</label>
+                            <select id="teacher-year-select" onchange="loadStudentGradesToMatrix()">
+                                <option value="2026">2026/2027</option>
+                                <option value="2027">2027/2028</option>
+                                <option value="2028">2028/2029</option>
+                                <option value="2029">2029/2030</option>
+                                <option value="2030">2030/2031</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex:1; min-width:150px; margin-bottom:0;">
+                            <label>المستوى الدراسي الحالي لتصفية النقط / الطباعة:</label>
+                            <select id="teacher-level-filter-grades" onchange="updateStudentDropdowns(); loadStudentGradesToMatrix();">
+                                <option value="all">-- الكل --</option>
+                                <option value="السنة الأولى إعدادي">السنة الأولى إعدادي</option>
+                                <option value="السنة الثانية إعدادي">السنة الثانية إعدادي</option>
+                                <option value="السنة الثالثة إعدادي">السنة الثالثة إعدادي</option>
+                                <option value="الجذع المشترك">الجذع المشترك</option>
+                                <option value="السنة الأولى بكالوريا">السنة الأولى بكالوريا</option>
+                                <option value="السنة الثانية بكالوريا">السنة الثانية بكالوريا</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex:1.5; min-width:180px; margin-bottom:0;"><label>اختر كود التلميذ:</label><select id="teacher-student-select" onchange="loadStudentGradesToMatrix()"></select></div>
+                        <div class="form-group" style="flex:1.5; min-width:150px; margin-bottom:0;"><label>هاتف ولي الأمر (للواتساب):</label><input type="text" id="teacher-parent-phone" placeholder="21260000000"></div>
+                    </div>
+                    
+                    <div id="matrix-container" style="display: none; margin-top: 30px;">
+                        <table>
+                            <thead><tr><th>المادة</th><th>الفرض 1</th><th>الفرض 2</th><th>الفرض 3</th><th>الفرض 4</th><th>الامتحان</th></tr></thead>
+                            <tbody id="teacher-matrix-tbody"></tbody>
+                        </table>
+                        <button class="btn-primary" style="margin-top: 25px;" onclick="saveStudentMatrixAndSend()">💾 حفظ النقط وإرسال التقرير</button>
+                    </div>
+                </div>
+
+                <div id="sec-teacher-attendance" class="view-section">
+                    <h3 style="color: var(--accent); margin-bottom: 25px;">📊 إدارة وتسجيل الغيابات</h3>
+                    
+                    <div class="grid-2">
+                        <div style="background: #151522; padding: 25px; border-radius: 16px;">
+                            <h4 style="color: var(--accent); margin-bottom: 20px;">🛑 تسجيل غياب التلاميذ</h4>
+                            <div class="form-group">
+                                <label>الموسم الدراسي:</label>
+                                <select id="attendance-year-select">
+                                    <option value="2026">2026/2027</option>
+                                    <option value="2027">2027/2028</option>
+                                    <option value="2028">2028/2029</option>
+                                    <option value="2029">2029/2030</option>
+                                    <option value="2030">2030/2031</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>المستوى الدراسي:</label>
+                                <select id="teacher-level-filter-att" onchange="updateStudentDropdowns()">
+                                    <option value="all">-- جميع المستويات --</option>
+                                    <option value="السنة الأولى إعدادي">السنة الأولى إعدادي</option>
+                                    <option value="السنة الثانية إعدادي">السنة الثانية إعدادي</option>
+                                    <option value="السنة الثالثة إعدادي">السنة الثالثة إعدادي</option>
+                                    <option value="الجذع المشترك">الجذع المشترك</option>
+                                    <option value="السنة الأولى بكالوريا">السنة الأولى بكالوريا</option>
+                                    <option value="السنة الثانية بكالوريا">السنة الثانية بكالوريا</option>
+                                </select>
+                            </div>
+                            <div class="form-group"><label>اختر التلميذ:</label><select id="attendance-student-select"></select></div>
+                            <div class="form-group"><label>المادة / الحصة:</label><select id="attendance-subject-select"></select></div>
+                            <div class="form-group"><label>التاريخ:</label><input type="date" id="attendance-date"></div>
+                            <div class="form-group">
+                                <label>حالة الغياب:</label>
+                                <select id="attendance-status">
+                                    <option value="غائب غير مبرر">غائب غير مبرر ❌</option>
+                                    <option value="غائب مبرر">غائب مبرر 📝</option>
+                                </select>
+                            </div>
+                            <button class="btn-primary" onclick="saveStudentAttendance()">تسجيل غياب التلميذ وإشعار الواتساب</button>
+                        </div>
+
+                        <div style="background: #151522; padding: 25px; border-radius: 16px; display: flex; flex-direction: column;">
+                            <h4 style="color: #f1c40f; margin-bottom: 20px;">👨‍🏫 تسجيل غيابي الشخصي (الأستاذ)</h4>
+                            <div class="form-group">
+                                <label>الموسم الدراسي:</label>
+                                <select id="teacher-abs-year-select">
+                                    <option value="2026">2026/2027</option>
+                                    <option value="2027">2027/2028</option>
+                                    <option value="2028">2028/2029</option>
+                                    <option value="2029">2029/2030</option>
+                                    <option value="2030">2030/2031</option>
+                                </select>
+                            </div>
+                            <div class="form-group"><label>تاريخ الغياب:</label><input type="date" id="teacher-abs-date"></div>
+                            <div class="form-group"><label>سبب الغياب / ملاحظة:</label><textarea id="teacher-abs-reason" rows="3" placeholder="مثال: رخصة طبية، ظروف قاهرة..."></textarea></div>
+                            <button class="btn-primary" style="background: linear-gradient(135deg, #f1c40f, #d35400);" onclick="saveTeacherAbsence()">حفظ الغياب الشخصي</button>
+                            
+                            <h5 style="margin-top: 25px; margin-bottom:10px; color: white;">📋 أرشيف غيابات الأستاذ:</h5>
+                            <div style="max-height: 150px; overflow-y: auto;">
+                                <table style="font-size: 13px;">
+                                    <thead><tr><th>التاريخ</th><th>السبب / الملاحظة</th></tr></thead>
+                                    <tbody id="teacher-abs-history-tbody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sec-teacher-complaints" class="view-section">
+                    <h3 style="color: var(--accent); margin-bottom: 25px;">📥 صندوق الشكايات الواردة</h3>
+                    <table>
+                        <thead><tr><th>كود التلميذ</th><th>المادة</th><th>نص الشكاية</th></tr></thead>
+                        <tbody id="teacher-complaints-tbody"></tbody>
+                    </table>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <div id="print-area"></div>
+
+    <script>
+        // 212 Accounts
+        const allowedStudents = {
+            "K38472619@soma.ma": "Xr9#M2qL81", "F91827463@soma.ma": "Bv7@P4nT56",
+            "R56281947@soma.ma": "Hk3!Z8wQ29", "A73049185@soma.ma": "Nf6$R1xY73",
+            "M18473629@soma.ma": "Qp2&L9mV48", "B94726150@soma.ma": "Tj8#C5aW14",
+            "T61583942@soma.ma": "Ym4@H7kP62", "H20857491@soma.ma": "Ds1!X9rN35",
+            "L79304628@soma.ma": "Uw5$F2bJ87", "C45198273@soma.ma": "Gm7@Q6zK19",
+            "N86024715@soma.ma": "Vx3!T8cL54", "P32917584@soma.ma": "Rp9#Y1hD26",
+            "D61472590@soma.ma": "Zx2$W6bM91", "G84392017@soma.ma": "Lm8@R3tQ72",
+            "J56278149@soma.ma": "Kp4!V9mH35", "S23098416@soma.ma": "Fb7#C1aL68",
+            "V71926304@soma.ma": "Qn2$P8mT53", "W40519726@soma.ma": "Jh9@Z4xY87",
+            "Y83264015@soma.ma": "Md3!R7kN19", "Z61728394@soma.ma": "Tx6#L5wQ23",
+            "E50394817@soma.ma": "Hb2$N9cV71", "U92637485@soma.ma": "Rw7@K3tM56",
+            "Q38491026@soma.ma": "Yn1!P8zL94", "O67254013@soma.ma": "Gf6#W2bH37",
+            "I94827365@soma.ma": "Pc8@J4nD65", "K27596183@soma.ma": "Mv3!T6kQ12",
+            "F59382714@soma.ma": "Lb9#R1wM78", "R44930265@soma.ma": "Dt2$V7xP35",
+            "A16928374@soma.ma": "Xb4@H8mL26", "M73619482@soma.ma": "Zk1!Q5tW97",
+            "B40582637@soma.ma": "Rn7#P3cV18", "T98261345@soma.ma": "Yd2$K6zN54",
+            "H27495861@soma.ma": "Wc8@L1bQ73", "L61739520@soma.ma": "Jt3!N7xM29",
+            "C83920471@soma.ma": "Fq6#R2wP81", "N15264893@soma.ma": "Vm9@D4tK56",
+            "P49582716@soma.ma": "Qz2!X6nB35", "D73820164@soma.ma": "Hy7#V1mL90",
+            "G26491735@soma.ma": "Tk3@P9wQ47", "J83715209@soma.ma": "Ld8$N2zH63",
+            "S50629487@soma.ma": "Zp1!R7kT28", "V27396581@soma.ma": "Mw6#C3bY74",
+            "W61948023@soma.ma": "Jn2@K8xL51", "Y38572640@soma.ma": "Db9!T4mP16",
+            "Z94718362@soma.ma": "Qk3#V6nH89", "E28461509@soma.ma": "Fp7@W2zK35",
+            "U53794810@soma.ma": "Lv1!N7cQ42", "Q15937268@soma.ma": "Bm8#R3tM67",
+            "O48273659@soma.ma": "Nd2@H9xP18", "I79350426@soma.ma": "Yr6!K1nL73",
+            "K60827195@soma.ma": "Tc3#W7bQ59", "F20495831@soma.ma": "Hp9@D2mV41",
+            "R59531425@soma.ma": "Zr1!P6xT89", "A82714930@soma.ma": "Mk8#N3cL27",
+            "M36495081@soma.ma": "Jb2@R9wK56", "B71926340@soma.ma": "Qv6!T1mP32",
+            "T40625873@soma.ma": "Wx3#L8zN15", "H92736148@soma.ma": "Dp7@K2tQ64",
+            "L38510629@soma.ma": "Vm1!R9cY37", "C71639482@soma.ma": "Fn8#P4xL76",
+            "N20483715@soma.ma": "Hb2@W7mT51", "P59372804@soma.ma": "Jr6!N3kQ28",
+            "D85019437@soma.ma": "Yp3#V8bL92", "G26783051@soma.ma": "Tc9@K1zM45",
+            "J61429583@soma.ma": "Qd2!P6nR33", "S93857420@soma.ma": "Lm7#W4xT68",
+            "V17294638@soma.ma": "Bk1@R9cH24", "W60521739@soma.ma": "Zn6!T3mL87",
+            "Y83990127@soma.ma": "Fp2#N7kQ19", "Z26395814@soma.ma": "Md8@V1xP53",
+            "E59481726@soma.ma": "Tb3!K6wL29", "U84150239@soma.ma": "Qn9#R2cM67",
+            "Q35792018@soma.ma": "Gv1@P8zT34", "O96237415@soma.ma": "Ry7!W4kL91",
+            "I47582630@soma.ma": "Jh2#N9mQ56", "K19503748@soma.ma": "Dd6@V3xP78",
+            "F60418295@soma.ma": "Zn1!T8cL24", "P82376410@soma.ma": "Pc7#W2bH65",
+            "A91650427@soma.ma": "Mx3@R6nT38", "M52837169@soma.ma": "Kb9!N1qL83",
+            "B76490125@soma.ma": "Jz2#V7mP45", "T13958674@soma.ma": "Fn7@P3xQ17",
+            "H64295730@soma.ma": "Jb2@W2mL34", "L90518362@soma.ma": "Ln3@P9cQ13",
+            "I95325084@soma.ma": "Lv3@P6zD34", "S30481229@soma.ma": "Qv3!K7mL59",
+            "F58639739@soma.ma": "Kb2#W2cQ39", "I67923450@soma.ma": "Jy1@P9wT36",
+            "K30457849@soma.ma": "Qp2#V3mL35", "Z48817326@soma.ma": "Qd2!N8wM35",
+            "E91527364@soma.ma": "Jv6#R4xP71", "U20394875@soma.ma": "Bm1@T7zL48",
+            "Q67214903@soma.ma": "Yr8!K2nQ93", "O43857621@soma.ma": "Zp3#W9cL17",
+            "I76491235@soma.ma": "Fn7@P1xT59", "K92058317@soma.ma": "Ld2!N6kQ84",
+            "F61540928@soma.ma": "Mv9#R3cH24", "R37182605@soma.ma": "Jt1@W8zL36",
+            "A08461572@soma.ma": "Qy6!T2nP78", "M59370148@soma.ma": "Hp3#K7xQ15",
+            "B36281497@soma.ma": "Zk1@N9mL67", "T75026319@soma.ma": "Rw9!P4cT29",
+            "H26493085@soma.ma": "Vb2#W6xQ83", "L81749526@soma.ma": "Nd9@R3zT41",
+            "C09372658@soma.ma": "Jm1!K7nL56", "N54820137@soma.ma": "Yq7#P2cM94",
+            "P13667728@soma.ma": "Tc2@W8zQ13", "D61729483@soma.ma": "Bk9#V1mT63",
+            "Z13826047@soma.ma": "Fc1#P3xL29", "G29581740@soma.ma": "Ln3@P7xQ28",
+            "T13990125@soma.ma": "Jb2@W2mQ34", "J83922614@soma.ma": "Qd6!N2kL89",
+            "S01618362@soma.ma": "Vb3#W3kL87", "V65290413@soma.ma": "Jn5@TdeL82",
+            "W72519136@soma.ma": "Hp1@T6zP54", "Y52881738@soma.ma": "Zr9!K8nQ31",
+            "Y52861739@soma.ma": "W22#P9kC88", "Z93462518@soma.ma": "Ry7@W1mT28",
+            "C33626043@soma.ma": "Nd9!W3mT33", "B76432338@soma.ma": "Qv2#P9nQ14",
+            "U26321029@soma.ma": "Zt1@P3mL56", "D66071923@soma.ma": "Dn2@W9mL03",
+            "D20388526@soma.ma": "Md3!W9cQ59", "Q21336763@soma.ma": "Yw6!K3mL78",
+            "N20804783@soma.ma": "Vt2#W9cQ55", "T35483273@soma.ma": "Fc2#W9mL36",
+            "V85338862@soma.ma": "Vt9@W5xT22", "A36328672@soma.ma": "J63!WmL38",
+            "M28804759@soma.ma": "Np2@W7cQ35", "T73885881@soma.ma": "Rn1@W9xT31",
+            "L42892639@soma.ma": "Yb6!K3mL29", "N93586879@soma.ma": "Ma2!W9mL38",
+            "W12802324@soma.ma": "Ht2@P9nT26", "L47992631@soma.ma": "Rp3#K6cQ99",
+            "C95013817@soma.ma": "Mp3@WmT27", "B63379329@soma.ma": "Zr2@P3cQ36",
+            "A90610429@soma.ma": "Md2@W8zP13", "D31274958@soma.ma": "Jd7!P3cLT64",
+            "B61952807@soma.ma": "Jb1@W9xT31", "T37489261@soma.ma": "Dr8@W2xT45",
+            "H80521639@soma.ma": "Zn3!P7mL27", "L14159726@soma.ma": "Qb6#K9cR31",
+            "C64928317@soma.ma": "Fy2@N4zT86", "N26387594@soma.ma": "Mp9!W1kQ53",
+            "P90612843@soma.ma": "Jv7#P3xL19", "D31274958@soma.ma": "W33@N7hT64",
+            "G75826019@soma.ma": "Jb1@W9xT31", "J46291739@soma.ma": "Zr8#W3zE34",
+            "S81715222@soma.ma": "Ln3@P9xQ19", "V59326084@soma.ma": "Uy8!W9mL91",
+            "W24718395@soma.ma": "Ht2#K3xQ36", "Y60591428@soma.ma": "Rp9@W1zT48",
+            "Z26339837@soma.ma": "Zp3@R2mL38", "F38630932@soma.ma": "Dc2@P2mL36",
+            "D82457103@soma.ma": "Lp9@W3aL37", "G39081746@soma.ma": "Vt1@W3xL34",
+            "C65018472@soma.ma": "Md3@K7mL63", "N13657829@soma.ma": "Jz2@P9qQ36",
+            "P84033194@soma.ma": "Vd8!W3mL37", "D49823746@soma.ma": "Rp9@W2zT20",
+            "E76729483@soma.ma": "Vc1!P7cL26", "E75934128@soma.ma": "Md6#N2kQ85",
+            "U29486513@soma.ma": "Jb2@W9xT31", "Q86071239@soma.ma": "Zr8!P3mL64",
+            "O43715926@soma.ma": "Kn3@R9cQ79", "I95685047@soma.ma": "Jy7@W6zL54",
+            "S30481029@soma.ma": "Vb6#K8rQ41", "V51829460@soma.ma": "Rb3#P6cQ79",
+            "F65368827@soma.ma": "Jd6@W2nT53", "R31067825@soma.ma": "Ld3!K9mL67",
+            "A36315632@soma.ma": "Hp7#K2cQ84", "I95685047@soma.ma": "Zr2@P9nT36",
+            "S30481226@soma.ma": "Kb3#K6cQ71", "V94102736@soma.ma": "Jy6@W2zT49",
+            "C56831974@soma.ma": "Qn2#K9cQ35", "Jp3681129@soma.ma": "Vt9@W3zT18",
+            "O38038619@soma.ma": "Rp3#K6cQ99", "P54213817@soma.ma": "Jd6@W2nT53",
+            "A71067825@soma.ma": "Ld3!K9mL67", "F64838127@soma.ma": "Hp7#K2cQ84",
+            "B51700386@soma.ma": "Zr2@P9nT36", "H83576092@soma.ma": "Kb3#K6cQ71",
+            "L94102736@soma.ma": "Jy6@W2zT49", "N30681759@soma.ma": "Qn2#K9cQ35",
+            "X12345678@soma.ma": "A1!bC2dE", "Y87654321@soma.ma": "B2@cD3eF",
+            "Z11223344@soma.ma": "C3#dE4fG", "W44332211@soma.ma": "D4$eF5gH",
+            "V55667788@soma.ma": "E5%fG6hI", "U88776655@soma.ma": "F6^gH7iJ",
+            "T99001122@soma.ma": "G7&hI8jK", "S22110099@soma.ma": "H8*iJ9kL",
+            "R33445566@soma.ma": "I9(jK0lM", "Q66554433@soma.ma": "J0)kL1mN",
+            "P77889900@soma.ma": "K1!lM2nO", "O00998877@soma.ma": "L2@mN3oP",
+            "N13579246@soma.ma": "M3#nO4pQ", "M24680135@soma.ma": "N4$oP5qR",
+            "L97531864@soma.ma": "O5%pQ6rS", "K86420975@soma.ma": "P6^qR7sT",
+            "J12312312@soma.ma": "Q7&rS8tU", "I45645645@soma.ma": "R8*sT9uV",
+            "H78978978@soma.ma": "S9(tU0vW", "G01201201@soma.ma": "T0)uV1wX",
+            "F34534534@soma.ma": "U1!vW2xY", "E67867867@soma.ma": "V2@wX3yZ",
+            "D90190190@soma.ma": "W3#xY4zA", "C23423423@soma.ma": "X4$yZ5aB",
+            "B56756756@soma.ma": "Y5%zA6bC", "A89089089@soma.ma": "Z6^aB7cD",
+            "M11221122@soma.ma": "A7&bC8dE", "N33443344@soma.ma": "B8*cD9eF",
+            "O55665566@soma.ma": "C9(dE0fG", "P77887788@soma.ma": "D0)eF1gH",
+            "Q99009900@soma.ma": "E1!fG2hI", "R22332233@soma.ma": "F2@gH3iJ",
+            "S44554455@soma.ma": "G3#hI4jK", "T66776677@soma.ma": "H4$iJ5kL",
+            "U88998899@soma.ma": "I5%jK6lM", "V00110011@soma.ma": "J6^kL7mN",
+            "W12121212@soma.ma": "K7&lM8nO", "X34343434@soma.ma": "L8*mN9oP"
+        };
+
+        const levelsMapping = [
+            "السنة الأولى إعدادي", "السنة الثانية إعدادي", "السنة الثالثة إعدادي", 
+            "الجذع المشترك", "السنة الأولى بكالوريا", "السنة الثانية بكالوريا"
+        ];
+        const studentLevels = {};
+        let sIdx = 0;
+        Object.keys(allowedStudents).forEach(email => {
+            studentLevels[email] = levelsMapping[Math.floor(sIdx / 36)] || "السنة الثانية بكالوريا";
+            sIdx++;
+        });
+
+        const subjectsList = ["الرياضيات", "الفيزياء والكيمياء", "علوم الحياة والأرض", "الفلسفة", "اللغة العربية", "اللغة الفرنسية", "اللغة الإنجليزية", "التربية الإسلامية", "التاريخ والجغرافيا"];
+
+        const riddlesDatabase = [
+            { q: "ما هو العدد الذي إذا ضربته في نفسه وأضفت إليه 5 أصبح 30؟", a: "العدد هو 5 (5×5 = 25 + 5 = 30)" },
+            { q: "شخص عمره 4 سنوات، وأخته عمرها نصف عمره. فإذا أصبح عمره 100 سنة، كم سيكون عمر أخته؟", a: "98 سنة" },
+            { q: "كلما أخذت مني كَبُرتْ، وكلما أضفت إليّ صَغُرتْ، فما أنا؟", a: "الحفرة" }
+        ];
+
+        let currentUser = ''; let currentRole = ''; let activeStudentCode = '';
+        let timerInterval = null; let timeLeft = 25 * 60;
+
+        document.getElementById('attendance-date').valueAsDate = new Date();
+        document.getElementById('teacher-abs-date').valueAsDate = new Date();
+
+        const ySel = document.getElementById('public-exam-year');
+        for (let i = 2025; i >= 2000; i--) { let opt = document.createElement('option'); opt.value = i; opt.innerHTML = `دورة ${i}`; ySel.appendChild(opt); }
+
+        // استدعاء الدروس المضافة حديثا في الصفحة الرئيسية عند فتح الموقع
+        loadPublicLessons();
+
+        function startAnimatedDownload() {
+            const overlay = document.getElementById('download-overlay');
+            const bar = document.getElementById('p-bar'); const txt = document.getElementById('p-text');
+            overlay.style.display = 'flex'; let progress = 0; bar.style.width = '0%'; txt.innerText = '0%';
+            let interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 8) + 2;
+                if (progress >= 100) {
+                    progress = 100; clearInterval(interval);
+                    setTimeout(() => { overlay.style.display = 'none'; window.open(`https://www.google.com`, '_blank'); }, 500);
+                }
+                bar.style.width = progress + '%'; txt.innerText = progress + '%';
+            }, 150);
+        }
+
+        function navigateTo(pageId) {
+            document.querySelectorAll('.app-page').forEach(page => page.classList.remove('active-page'));
+            document.getElementById(pageId).classList.add('active-page');
+            if(pageId === 'page-public') loadPublicLessons();
+        }
+
+        function processLogin() {
+            const email = document.getElementById('input-email').value.trim(); const pass = document.getElementById('input-pass').value.trim();
+            if (email === "admin@moutanabi.ma" && pass === "admin") { currentRole = 'teacher'; currentUser = email; initDashboard(); return; }
+            if (allowedStudents[email] && allowedStudents[email] === pass) {
+                currentRole = 'student'; currentUser = email; activeStudentCode = email.split('@')[0].toUpperCase();
+                initDashboard();
+            } else { alert('المعطيات غير صحيحة!'); }
+        }
+
+        function initDashboard() {
+            navigateTo('page-dashboard');
+            
+            let namesDb = JSON.parse(localStorage.getItem('moutanabi_names_db')) || {};
+
+            if(currentRole === 'student') {
+                let mappedName = namesDb[activeStudentCode] ? `${namesDb[activeStudentCode]}` : activeStudentCode;
+                let levelName = studentLevels[currentUser] || "مستوى غير محدد";
+                document.getElementById('user-display-email').innerText = mappedName;
+                document.getElementById('user-display-role').innerText = levelName;
+            } else {
+                document.getElementById('user-display-email').innerText = currentUser;
+            }
+
+            const menu = document.getElementById('dynamic-menu'); menu.innerHTML = '';
+            const compSelect = document.getElementById('comp-subject'); compSelect.innerHTML = '';
+            subjectsList.forEach(s => compSelect.innerHTML += `<option value="${s}">${s}</option>`);
+
+            if (currentRole === 'teacher') {
+                document.getElementById('avatar-icon').innerText = "👨‍🏫"; document.getElementById('user-display-role').innerText = "مدير المنظومة";
+                menu.innerHTML = `
+                    <li class="nav-item active" id="menu-teacher-grades"><button onclick="switchSection('teacher-grades')">📝 مسك النقط والواتساب</button></li>
+                    <li class="nav-item" id="menu-teacher-publish"><button onclick="switchSection('teacher-publish')">📥 نشر الدروس والتمارين</button></li>
+                    <li class="nav-item" id="menu-teacher-attendance"><button onclick="switchSection('teacher-attendance')">📅 إدارة وتسجيل الغياب</button></li>
+                    <li class="nav-item" id="menu-teacher-complaints"><button onclick="switchSection('teacher-complaints')">📥 شكايات التلاميذ</button></li>
+                `;
+                
+                updateStudentDropdowns();
+
+                const attSubjSelect = document.getElementById('attendance-subject-select');
+                attSubjSelect.innerHTML = '';
+                subjectsList.forEach(s => attSubjSelect.innerHTML += `<option value="${s}">${s}</option>`);
+
+                const pubSubjSelect = document.getElementById('pub-subject');
+                pubSubjSelect.innerHTML = '';
+                subjectsList.forEach(s => pubSubjSelect.innerHTML += `<option value="${s}">${s}</option>`);
+
+                switchSection('teacher-grades');
+                renderTeacherAbsenceHistory();
+            } else {
+                document.getElementById('avatar-icon').innerText = "🎓";
+                menu.innerHTML = `
+                    <li class="nav-item active" id="menu-student-grades"><button onclick="switchSection('student-grades')">📊 بيان النقط الحالي</button></li>
+                    <li class="nav-item" id="menu-student-attendance"><button onclick="switchSection('student-attendance')">📅 تتبع الغيابات</button></li>
+                    <li class="nav-item" id="menu-student-fun"><button onclick="switchSection('student-fun')">🎯 التحدي والتركيز</button></li>
+                    <li class="nav-item" id="menu-student-complaint"><button onclick="switchSection('student-complaint')">✍️ تقديم شكاية</button></li>
+                `;
+                switchSection('student-grades'); document.getElementById('student-year-select').value = "2026"; switchSection('student-grades'); loadNewRiddle();
+            }
+        }
+
+        function updateStudentDropdowns() {
+            const filterGrades = document.getElementById('teacher-level-filter-grades') ? document.getElementById('teacher-level-filter-grades').value : "all";
+            const filterAtt = document.getElementById('teacher-level-filter-att') ? document.getElementById('teacher-level-filter-att').value : "all";
+            const filterMap = document.getElementById('teacher-level-filter-map') ? document.getElementById('teacher-level-filter-map').value : "all";
+
+            const sSelect = document.getElementById('teacher-student-select');
+            const attStudentSelect = document.getElementById('attendance-student-select');
+            const mapSelect = document.getElementById('map-student-code');
+
+            let namesDb = JSON.parse(localStorage.getItem('moutanabi_names_db')) || {};
+
+            const populateSelect = (selectElem, filterVal) => {
+                if(!selectElem) return;
+                const currentVal = selectElem.value;
+                selectElem.innerHTML = '<option value="">-- اختر تلميذاً --</option>';
+                
+                Object.keys(allowedStudents).forEach(email => {
+                    let code = email.split('@')[0].toUpperCase();
+                    let level = studentLevels[email] || "غير محدد";
+                    
+                    if (filterVal !== "all" && filterVal !== level) return;
+                    
+                    let name = namesDb[code] ? ` [ ${namesDb[code]} ]` : "";
+                    selectElem.innerHTML += `<option value="${code}">${code}${name} - ${level}</option>`;
+                });
+                
+                if(Array.from(selectElem.options).some(o => o.value === currentVal)) selectElem.value = currentVal;
+            };
+
+            populateSelect(sSelect, filterGrades);
+            populateSelect(attStudentSelect, filterAtt);
+            populateSelect(mapSelect, filterMap);
+        }
+
+        function saveStudentNameMapping() {
+            const code = document.getElementById('map-student-code').value;
+            const name = document.getElementById('map-student-name').value.trim();
+            if(!code) return alert("المرجو اختيار كود التلميذ أولاً من القائمة!");
+
+            let namesDb = JSON.parse(localStorage.getItem('moutanabi_names_db')) || {};
+            namesDb[code] = name;
+            localStorage.setItem('moutanabi_names_db', JSON.stringify(namesDb));
+
+            alert(`✅ تم ربط الكود ${code} بنجاح بالإسم: ${name || 'بدون اسم'}`);
+            updateStudentDropdowns();
+            loadMappedName();
+        }
+
+        function loadMappedName() {
+            const code = document.getElementById('map-student-code').value;
+            let namesDb = JSON.parse(localStorage.getItem('moutanabi_names_db')) || {};
+            document.getElementById('map-student-name').value = namesDb[code] || "";
+        }
+
+        function switchSection(secId) {
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('show'));
+            document.querySelectorAll('.nav-menu li').forEach(li => li.classList.remove('active'));
+            document.getElementById(`sec-${secId}`).classList.add('show');
+            if(document.getElementById(`menu-${secId}`)) document.getElementById(`menu-${secId}`).classList.add('active');
+            
+            if (secId === 'student-grades') { renderStudentGrades(); renderStudentAttendance(); }
+            if (secId === 'student-attendance') { renderStudentAttendance(); }
+            if (secId === 'teacher-complaints') renderTeacherComplaints();
+            if (secId === 'teacher-attendance') renderTeacherAbsenceHistory();
+        }
+
+        /* دالة توليد بطاقات الحسابات والطباعة المباشرة */
+        function printStudentCards() {
+            const filterVal = document.getElementById('teacher-level-filter-grades').value;
+            let namesDb = JSON.parse(localStorage.getItem('moutanabi_names_db')) || {};
+            
+            const printArea = document.getElementById('print-area');
+            printArea.innerHTML = '';
+            
+            let count = 0;
+            Object.keys(allowedStudents).forEach(email => {
+                let code = email.split('@')[0].toUpperCase();
+                let level = studentLevels[email] || "غير محدد";
+                
+                if (filterVal !== "all" && filterVal !== level) return;
+                
+                let name = namesDb[code] || "لم يربط بالإسم بعد";
+                let pass = allowedStudents[email];
+                
+                printArea.innerHTML += `
+                    <div class="print-card">
+                        <div class="print-card-header">🎓 منصة المتنبي التعليمية المتكاملة</div>
+                        <div class="print-card-body">
+                            <div><b>الاسم الكامل:</b> ${name}</div>
+                            <div><b>المستوى الدراسي:</b> ${level}</div>
+                            <div><b>البريد الإلكتروني (الكود):</b> <span style="font-family: monospace; font-weight: bold;">${email}</span></div>
+                            <div><b>كلمة المرور الشخصية:</b> <span style="font-family: monospace; font-weight: bold;">${pass}</span></div>
+                        </div>
+                        <div class="print-card-footer">يرجى الحفاظ على سرية هذا الوصل لتسجيل الدخول المنزلي</div>
+                    </div>
+                `;
+                count++;
+            });
+            
+            if(count === 0) {
+                alert("تنبيه: لا يوجد أي تلاميذ فالقائمة يطابقون هاد المستوى لطباعة كروت غيابهم!");
+                return;
+            }
+            
+            window.print();
+        }
+
+        /* POMODORO & FUN */
+        function updateTimerDisplay() {
+            let mins = Math.floor(timeLeft / 60); let secs = timeLeft % 60;
+            document.getElementById('pomodoro-time').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        function startTimer() { if (timerInterval) return; timerInterval = setInterval(() => { if (timeLeft > 0) { timeLeft--; updateTimerDisplay(); } else { clearInterval(timerInterval); alert("سالات 25 دقيقة ديال التركيز!"); resetTimer(); } }, 1000); }
+        function pauseTimer() { clearInterval(timerInterval); timerInterval = null; }
+        function resetTimer() { pauseTimer(); timeLeft = 25 * 60; updateTimerDisplay(); }
+
+        function loadNewRiddle() {
+            let rand = riddlesDatabase[Math.floor(Math.random() * riddlesDatabase.length)];
+            document.getElementById('riddle-question').innerText = rand.q; document.getElementById('riddle-answer').innerText = rand.a; document.getElementById('riddle-answer').style.display = 'none';
+        }
+        function revealRiddleAnswer() { document.getElementById('riddle-answer').style.display = 'block'; }
+
+        /* OUTLOOK CSV */
+        function exportStudentsCSV() {
+            let csvContent = "First Name,Email Address,Level\n";
+            let namesDb = JSON.parse(localStorage.getItem('moutanabi_names_db')) || {};
+            Object.keys(allowedStudents).forEach(email => { 
+                let code = email.split('@')[0].toUpperCase();
+                let dispName = namesDb[code] ? namesDb[code] : code;
+                let level = studentLevels[email] || "غير محدد";
+                csvContent += `${dispName},${email},${level}\n`; 
+            });
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a"); a.href = url; a.download = "Massar_Outlook_Moutanabi.csv"; a.click();
+        }
+
+        /* دالة نشر الدروس الجديدة والفروض بالربط مع Google Sheets */
+        async function publishLesson() {
+            const title = document.getElementById('pub-title').value.trim();
+            const link = document.getElementById('pub-link').value.trim();
+            const subject = document.getElementById('pub-subject').value;
+            const level = document.getElementById('pub-level').value;
+            const desc = document.getElementById('pub-desc').value.trim();
+
+            if (!title || !link) return alert("المرجو إدخال العنوان والرابط على الأقل!");
+
+            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqj7FfGh8OsjeZGUVLgDyg6kWGEaNvfPgEQ0NyX5k5EM9k-plmGbIqgUJb8zwrA5s-ZQ/exec";
+            
+            const data = { title, link, subject, level, desc };
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                alert('✅ تم نشر الدرس بنجاح ومزامنته مع Google Sheets للدراري!');
+                
+                document.getElementById('pub-title').value = '';
+                document.getElementById('pub-link').value = '';
+                document.getElementById('pub-desc').value = '';
+                
+                loadPublicLessons();
+            } catch (error) {
+                console.error("Error publishing:", error);
+                alert("حدث خطأ أثناء الاتصال بالسيرفر. المرجو التحقق من الإنترنت.");
+            }
+        }
+
+        /* دالة جلب وعرض الدروس المنشورة في الصفحة الرئيسية للجميع من Google Sheets مباشرة */
+        async function loadPublicLessons() {
+            const container = document.getElementById('public-dynamic-lessons');
+            if(!container) return;
+            container.innerHTML = `<p style="color: var(--text-muted); text-align: center; width: 100%;">جاري تحميل الدروس من السيرفر السحابي... 🔄</p>`;
+            
+            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqj7FfGh8OsjeZGUVLgDyg6kWGEaNvfPgEQ0NyX5k5EM9k-plmGbIqgUJb8zwrA5s-ZQ/exec";
+
+            try {
+                let response = await fetch(SCRIPT_URL);
+                let published = await response.json();
+                
+                container.innerHTML = '';
+                
+                if(!published || published.length === 0) {
+                    container.innerHTML = `<p style="color: var(--text-muted); text-align: center; width: 100%;">لا توجد دروس أو فروض مضافة حديثاً في الوقت الحالي.</p>`;
+                    return;
+                }
+
+                // عرض الأحدث أولاً
+                published.reverse();
+
+                published.forEach(item => {
+                    let color1 = "#9b59b6"; let color2 = "#8e44ad";
+                    let classBadge = item.level ? `<br><span style="font-size:11px; font-weight:bold; background:rgba(255,255,255,0.2); padding:3px 8px; border-radius:5px; margin-top:5px; display:inline-block;">🎓 ${item.level}</span>` : '';
+                    
+                    container.innerHTML += `
+                        <div class="lesson-card" style="border-color: ${color1};">
+                            <div class="lesson-image" style="background: linear-gradient(135deg, ${color1}, ${color2}); font-size: 18px; text-align:center; padding:10px; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                                <span>${item.subject}</span>
+                                <small style="font-size:12px; font-weight:normal; margin-top:5px; opacity: 0.8;">📅 ${item.date}</small>
+                                ${classBadge}
+                            </div>
+                            <div class="lesson-content">
+                                <h3 style="font-size: 18px; margin-bottom: 10px;">${item.title}</h3>
+                                <p style="font-size: 14px; margin-bottom: 15px; color: var(--text-muted); max-height: 60px; overflow: hidden; text-overflow: ellipsis;">${item.desc || 'لا يوجد وصف إضافي.'}</p>
+                                <a href="${item.link}" target="_blank" style="text-decoration: none;">
+                                    <button class="btn-primary" style="background: ${color1}; box-shadow: 0 0 15px rgba(155, 89, 182, 0.3);">الذهاب للدرس / الفرض 🔗</button>
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error("Error fetching lessons:", error);
+                container.innerHTML = `<p style="color: var(--danger); text-align: center; width: 100%;">حدث خطأ أثناء تحميل الدروس. المرجو إعادة تحديث الصفحة ⚠️</p>`;
+            }
+        }
+
+        /* مسك النقط */
+        function loadStudentGradesToMatrix() {
+            const studentCode = document.getElementById('teacher-student-select').value;
+            const year = document.getElementById('teacher-year-select').value;
+            
+            if (!studentCode) { document.getElementById('matrix-container').style.display = 'none'; return; }
+            document.getElementById('matrix-container').style.display = 'block';
+            const tbody = document.getElementById('teacher-matrix-tbody'); tbody.innerHTML = '';
+            
+            let db = JSON.parse(localStorage.getItem('moutanabi_db_' + year)) || {}; 
+            let phonesDb = JSON.parse(localStorage.getItem('moutanabi_phones_db')) || {};
+            let studentData = db[studentCode] || {};
+            document.getElementById('teacher-parent-phone').value = phonesDb[studentCode] || "";
+
+            subjectsList.forEach(subject => {
+                let grades = studentData[subject] || ["", "", "", "", ""];
+                tbody.innerHTML += `<tr>
+                    <td style="font-weight:bold; color:white; text-align:right;">${subject}</td>
+                    <td><input type="number" step="0.25" class="grade-input" data-subj="${subject}" data-idx="0" value="${grades[0]}"></td>
+                    <td><input type="number" step="0.25" class="grade-input" data-subj="${subject}" data-idx="1" value="${grades[1]}"></td>
+                    <td><input type="number" step="0.25" class="grade-input" data-subj="${subject}" data-idx="2" value="${grades[2]}"></td>
+                    <td><input type="number" step="0.25" class="grade-input" data-subj="${subject}" data-idx="3" value="${grades[3]}"></td>
+                    <td><input type="number" step="0.25" class="grade-input" style="border-color:var(--accent);" data-subj="${subject}" data-idx="4" value="${grades[4]}"></td>
+                </tr>`;
+            });
+        }
+
+        function saveStudentMatrixAndSend() {
+            const studentCode = document.getElementById('teacher-student-select').value;
+            const year = document.getElementById('teacher-year-select').value;
+            const yearText = document.getElementById('teacher-year-select').options[document.getElementById('teacher-year-select').selectedIndex].text;
+            const phoneVal = document.getElementById('teacher-parent-phone').value.trim();
+            
+            let db = JSON.parse(localStorage.getItem('moutanabi_db_' + year)) || {};
+            let phonesDb = JSON.parse(localStorage.getItem('moutanabi_phones_db')) || {};
+            let namesDb = JSON.parse(localStorage.getItem('moutanabi_names_db')) || {};
+
+            if(!db[studentCode]) db[studentCode] = {}; phonesDb[studentCode] = phoneVal;
+
+            document.querySelectorAll('.grade-input').forEach(input => {
+                const subj = input.getAttribute('data-subj'); const idx = parseInt(input.getAttribute('data-idx'));
+                if (!db[studentCode][subj]) db[studentCode][subj] = ["", "", "", "", ""];
+                db[studentCode][subj][idx] = input.value.trim() !== "" ? parseFloat(input.value) : "";
+            });
+            
+            localStorage.setItem('moutanabi_db_' + year, JSON.stringify(db)); 
+            localStorage.setItem('moutanabi_phones_db', JSON.stringify(phonesDb));
+            alert(`✅ تم حفظ النقط بنجاح في قاعدة البيانات لـ ${yearText}`);
+
+            if (phoneVal) {
+                let stName = namesDb[studentCode] ? ` (${namesDb[studentCode]})` : "";
+                let message = `تقرير نتائج التلميذ(ة) [ *${studentCode}${stName}* ] 🎓\n`;
+                message += `📅 *${yearText}*\n\n`;
+                subjectsList.forEach(subject => {
+                    let grades = db[studentCode][subject] || ["--", "--", "--", "--", "--"];
+                    message += `*📘 ${subject}:* الفروض [${grades[0]||'-'}|${grades[1]||'-'}|${grades[2]||'-'}|${grades[3]||'-'}] الامتحان [${grades[4]||'-'}]\n`;
+                });
+                window.open(`https://api.whatsapp.com/send?phone=${phoneVal}&text=${encodeURIComponent(message)}`, '_blank');
+            }
+        }
+
+        function renderStudentGrades() {
+            const tbody = document.getElementById('student-grades-tbody'); tbody.innerHTML = '';
+            const year = document.getElementById('student-year-select').value;
+            
+            let db = JSON.parse(localStorage.getItem('moutanabi_db_' + year)) || {};
+            let studentData = db[activeStudentCode] || {};
+            let totalSum = 0; let count = 0;
+
+            subjectsList.forEach(subject => {
+                let grades = studentData[subject] || ["", "", "", "", ""];
+                let filled = grades.filter(g => g !== "" && g !== null);
+                let subAvgStr = "--";
+                if (filled.length === 5) {
+                    let avg = filled.reduce((a, b) => parseFloat(a) + parseFloat(b), 0) / 5;
+                    subAvgStr = avg.toFixed(2); totalSum += avg; count++;
+                }
+                tbody.innerHTML += `<tr>
+                    <td style="font-weight:bold; color:white;">${subject}</td>
+                    <td>${grades[0]||'--'}</td><td>${grades[1]||'--'}</td><td>${grades[2]||'--'}</td><td>${grades[3]||'--'}</td>
+                    <td style="color:var(--accent); font-weight:bold;">${grades[4]||'--'}</td>
+                    <td><span class="badge-grade">${subAvgStr}</span></td>
+                </tr>`;
+            });
+
+            const avgVal = document.getElementById('final-average-val');
+            const statusBadge = document.getElementById('final-status-badge');
+            if (count === subjectsList.length) {
+                let finalAvg = totalSum / count; avgVal.innerText = finalAvg.toFixed(2);
+                if(finalAvg >= 10) { statusBadge.innerText = "اللقب الحالي: التنين الذهبي الناجح 🐉"; statusBadge.style.color="#00ff88"; }
+                else { statusBadge.innerText = "اللقب الحالي: محارب الدورة الاستدراكية ⚔️"; statusBadge.style.color="var(--danger)"; }
+            } else {
+                avgVal.innerText = "--.--"; statusBadge.innerText = "في انتظار اكتمال نقط جميع المواد... 🛡️"; statusBadge.style.color="var(--text-muted)";
+            }
+        }
+
+        /* تسجيل الغياب */
+        function saveStudentAttendance() {
+            const year = document.getElementById('attendance-year-select').value;
+            const yearText = document.getElementById('attendance-year-select').options[document.getElementById('attendance-year-select').selectedIndex].text;
+            const student = document.getElementById('attendance-student-select').value;
+            const subject = document.getElementById('attendance-subject-select').value;
+            const date = document.getElementById('attendance-date').value;
+            const status = document.getElementById('attendance-status').value;
+
+            if(!date) return alert("المرجو تحديد تاريخ الغياب!");
+
+            let attDb = JSON.parse(localStorage.getItem('moutanabi_attendance_' + year)) || {};
+            if(!attDb[student]) attDb[student] = [];
+
+            attDb[student].push({ date: date, subject: subject, status: status });
+            localStorage.setItem('moutanabi_attendance_' + year, JSON.stringify(attDb));
+
+            alert(`✅ تم تسجيل غياب التلميذ ${student} بنجاح.`);
+
+            let phonesDb = JSON.parse(localStorage.getItem('moutanabi_phones_db')) || {};
+            let namesDb = JSON.parse(localStorage.getItem('moutanabi_names_db')) || {};
+            let phoneVal = phonesDb[student];
+            if(phoneVal) {
+                let stName = namesDb[student] ? ` (${namesDb[student]})` : "";
+                let msg = `⚠️ *إشعار غياب طارئ* ⚠️\n\nنعلمكم أن التلميذ(ة) [ *${student}${stName}* ] قد سجل غياباً خلال الحصة التالية:\n\n📘 *المادة:* ${subject}\n📅 *التاريخ:* ${date}\n📌 *الحالة:* ${status}\n🏫 *الموسم الدراسي:* ${yearText}\n\nالمرجو تبرير الغياب في أقرب وقت.`;
+                window.open(`https://api.whatsapp.com/send?phone=${phoneVal}&text=${encodeURIComponent(msg)}`, '_blank');
+            }
+        }
+
+        function saveTeacherAbsence() {
+            const year = document.getElementById('teacher-abs-year-select').value;
+            const date = document.getElementById('teacher-abs-date').value;
+            const reason = document.getElementById('teacher-abs-reason').value.trim();
+
+            if(!date) return alert("المرجو تحديد تاريخ الغياب!");
+
+            let teacherDb = JSON.parse(localStorage.getItem('moutanabi_teacher_abs_' + year)) || [];
+            teacherDb.push({ date: date, reason: reason || "بدون سبب مذكور" });
+            localStorage.setItem('moutanabi_teacher_abs_' + year, JSON.stringify(teacherDb));
+
+            alert("✅ تم تسجيل غيابك الشخصي بنجاح في الأرشيف.");
+            document.getElementById('teacher-abs-reason').value = '';
+            renderTeacherAbsenceHistory();
+        }
+
+        function renderTeacherAbsenceHistory() {
+            const year = document.getElementById('teacher-abs-year-select').value;
+            const tbody = document.getElementById('teacher-abs-history-tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+
+            let teacherDb = JSON.parse(localStorage.getItem('moutanabi_teacher_abs_' + year)) || [];
+            if(teacherDb.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" style="color:var(--text-muted);">لا توجد غيابات مسجلة لهذا الموسم.</td></tr>`;
+                return;
+            }
+            teacherDb.reverse().forEach(abs => {
+                tbody.innerHTML += `<tr><td><span class="badge-danger">${abs.date}</span></td><td style="color:white; text-align:right;">${abs.reason}</td></tr>`;
+            });
+        }
+
+        function renderStudentAttendance() {
+            const tbody = document.getElementById('student-attendance-tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            const year = document.getElementById('student-year-select').value;
+
+            let attDb = JSON.parse(localStorage.getItem('moutanabi_attendance_' + year)) || {};
+            let myAbsences = attDb[activeStudentCode] || [];
+
+            if(myAbsences.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="color:#2ecc71; font-weight:bold;">🎉 ممتاز! ليس لديك أي غياب في هذا الموسم الدراسي.</td></tr>`;
+                return;
+            }
+
+            myAbsences.reverse().forEach(abs => {
+                let badgeClass = abs.status.includes('غير مبرر') ? 'badge-danger' : 'badge-success';
+                tbody.innerHTML += `<tr>
+                    <td>${abs.date}</td>
+                    <td style="font-weight:bold; color:white;">${abs.subject}</td>
+                    <td><span class="${badgeClass}">${abs.status}</span></td>
+                    <td>${abs.status.includes('غير مبرر') ? '❌ مطلوب مبرر' : '✅ مقبول'}</td>
+                </tr>`;
+            });
+        }
+
+        /* الشكايات */
+        function submitComplaint() {
+            const subj = document.getElementById('comp-subject').value;
+            const msg = document.getElementById('comp-message').value.trim();
+            if(!msg) return alert('اكتب الرسالة أولا!');
+            let complaints = JSON.parse(localStorage.getItem('moutanabi_complaints_db')) || [];
+            complaints.push({ student: activeStudentCode, subject: subj, message: msg, date: new Date().toLocaleDateString('ar-MA') });
+            localStorage.setItem('moutanabi_complaints_db', JSON.stringify(complaints));
+            alert('✅ تم إرسال شكايتك للأستاذ بنجاح.'); document.getElementById('comp-message').value = '';
+        }
+
+        function renderTeacherComplaints() {
+            const tbody = document.getElementById('teacher-complaints-tbody'); tbody.innerHTML = '';
+            let complaints = JSON.parse(localStorage.getItem('moutanabi_complaints_db')) || [];
+            let namesDb = JSON.parse(localStorage.getItem('moutanabi_names_db')) || {};
+
+            if(complaints.length === 0) { tbody.innerHTML = `<tr><td colspan="3" style="color:var(--text-muted);">صندوق الشكايات فارغ حالياً.</td></tr>`; return; }
+            complaints.reverse().forEach(c => {
+                let nameStr = namesDb[c.student] ? `<br><span style="color:var(--accent); font-size:12px;">👤 ${namesDb[c.student]}</span>` : '';
+                tbody.innerHTML += `<tr><td><b>${c.student}</b>${nameStr}<br><small>${c.date}</small></td><td><b>${c.subject}</b></td><td style="text-align:right;">${c.message}</td></tr>`;
+            });
+        }
+
+        function processLogout() { location.reload(); }
+    </script>
+</body>
+</html>
